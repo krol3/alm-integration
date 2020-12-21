@@ -6,7 +6,7 @@ on:
       - "v*"
 env:
   ALIAS: v4f3f9r2
-  REP: alm-integration
+  REP: krol/alm-integration
 jobs:
   publish:
     name: Publish
