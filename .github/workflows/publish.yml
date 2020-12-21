@@ -39,8 +39,11 @@ jobs:
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Get version
         id: get_version
-        uses: battila7/get-version-action@v2
-      - run: echo Current tag ${{ steps.get_version.outputs.version }}
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: ${{ env.REP }}
+          tag-semver: |
+            {{version}}
 
       - name: Build and push - Docker/ECR
         id: docker_build
