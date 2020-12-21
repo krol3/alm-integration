@@ -5,8 +5,7 @@ env:
   - GO111MODULE=on
 before:
   hooks:
-    # You may remove this if you don't use go modules.
-    - go mod download
+
 builds:
   - id: alm-integration
     main: ./src/webhooksrv/webhooksrv.go
