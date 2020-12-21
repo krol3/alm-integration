@@ -6,7 +6,7 @@ on:
       - "v*"
 env:
   ALIAS: v4f3f9r2
-  REP: trivy-db
+  REP: alm-integration
 jobs:
   publish:
     name: Publish
