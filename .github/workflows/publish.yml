@@ -37,13 +37,10 @@ jobs:
           registry: public.ecr.aws
           username: ${{ secrets.AWS_ACCESS_KEY_ID }}
           password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - name: Get the version
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          images: ${{ env.REP }}
-          tag-semver: |
-            {{version}}
+      - name: Get version
+        id: get_version
+        uses: battila7/get-version-action@v2
+        run: echo Current tag ${{ steps.get_version.outputs.version }}
 
       - name: Build and push - Docker/ECR
         id: docker_build
@@ -54,11 +51,10 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.REP }}:${{ steps.docker_meta.outputs.version }}
-            public.ecr.aws/${{ env.ALIAS }}/${{ env.REP }}:${{ steps.docker_meta.outputs.version }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.REP }}:${{ steps.get_version.outputs.version }}
+            public.ecr.aws/${{ env.ALIAS }}/${{ env.REP }}:${{ steps.get_version.outputs.version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          labels: ${{ steps.docker_meta.outputs.labels }}
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
