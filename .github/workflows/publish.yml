@@ -40,7 +40,7 @@ jobs:
       - name: Get version
         id: get_version
         uses: battila7/get-version-action@v2
-        run: echo Current tag ${{ steps.get_version.outputs.version }}
+      - run: echo Current tag ${{ steps.get_version.outputs.version }}
 
       - name: Build and push - Docker/ECR
         id: docker_build
