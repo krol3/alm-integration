@@ -5,7 +5,7 @@ env:
   - GO111MODULE=on
 before:
   hooks:
-    pre: make all
+    - make all
 builds:
   - id: alm-integration
     main: ./src/webhooksrv/webhooksrv.go
