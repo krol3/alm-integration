@@ -1,0 +1,42 @@
+release:
+  draft: false
+  prerelease: auto
+env:
+  - GO111MODULE=off
+  - CGO_ENABLED=0
+  - GOPATH=/home/runner/work/alm-integration/alm-integration
+before:
+  hooks:
+    - make all
+builds:
+  - id: postee
+    dir: src
+    main: ./webhooksrv/webhooksrv.go
+    binary: postee
+    flags: "-gcflags=-trimpath={GOPATH}/src -asmflags=-trimpath={GOPATH}/src"
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    builds:
+      - postee
+    replacements:
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ .FullCommit }}"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs'
+      - '^test'
+      - '^release'
