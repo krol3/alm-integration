@@ -1,0 +1,40 @@
+name: Publish Chart Helm
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.5.0
+      - name: Install chart-releaser
+        run: |
+          wget https://github.com/helm/chart-releaser/releases/download/v1.1.1/chart-releaser_1.1.1_linux_amd64.tar.gz
+          tar xzvf chart-releaser_1.1.1_linux_amd64.tar.gz cr
+      - name: Package Upload helm chart
+        continue-on-error: true
+        run: |
+          ./cr package deploy/helm/postee
+          ./cr upload -o krolval -r helm-charts -p . --token ${{ secrets.HELM_REP_TOKEN }} -p .cr-release-packages
+      - name: Index helm chart
+        run: |
+          ./cr index -o krolval -r helm-charts -c https://krolval.github.io/helm-charts/ -i index.yaml
+      - name: Pushes index file
+        uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.HELM_REP_TOKEN }}
+        with:
+          source_file: 'index.yaml'
+          destination_repo: 'krolval/helm-charts'
+          destination_folder: '.'
+          user_email: 'bot@aquasec.com'
+          user_name: 'aqua-bot'
+          destination_branch: 'gh-pages'
