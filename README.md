@@ -1,29 +1,33 @@
+# Postee
+
+![Postee](postee.jpeg)
+
 ![Docker Pulls][docker-pull]
 ![Code Coverage][code-cov]
-![](https://github.com/aquasecurity/alm-integration/workflows/Go/badge.svg)
+![](https://github.com/aquasecurity/postee/workflows/Go/badge.svg)
 [![License][license-img]][license]
 
-[download]: https://img.shields.io/github/downloads/aquasecurity/alm-integration/total?logo=github
-[release-img]: https://img.shields.io/github/release/aquasecurity/alm-integration.svg?logo=github
-[release]: https://github.com/aquasecurity/alm-integration/releases
-[docker-pull]: https://img.shields.io/docker/pulls/aquasec/alm-integration?logo=docker&label=docker%20pulls%20%2F%20alm-integration
-[go-doc-img]: https://godoc.org/github.com/aquasecurity/alm-integration?status.svg
-[code-cov]: https://codecov.io/gh/aquasecurity/alm-integration/branch/master/graph/badge.svg
+[download]: https://img.shields.io/github/downloads/aquasecurity/postee/total?logo=github
+[release-img]: https://img.shields.io/github/release/aquasecurity/postee.svg?logo=github
+[release]: https://github.com/aquasecurity/postee/releases
+[docker-pull]: https://img.shields.io/docker/pulls/aquasec/postee?logo=docker&label=docker%20pulls%20%2F%20postee
+[go-doc-img]: https://godoc.org/github.com/aquasecurity/postee?status.svg
+[code-cov]: https://codecov.io/gh/aquasecurity/postee/branch/master/graph/badge.svg
 [license-img]: https://img.shields.io/badge/License-mit-blue.svg
-[license]: https://github.com/aquasecurity/alm-integration/blob/master/LICENSE
+[license]: https://github.com/aquasecurity/postee/blob/master/LICENSE
 
-# Integrating Aqua Security with Ticketing and Collaboration Systems #
-Use this project to integrate Aqua with JIRA, Email, Slack, Microsoft Teams, Generic WebHook and ServiceNow systems and create a ticket, or send a message/email when new vulnerabilities are found in an image scan done by Aqua.
+## Description
 
-------
+A simple container for enhancing the available outputs for Aqua Security.
+Postee can send a message to variety of target systems one a new image vulnerability is discovered.
+The supported systems are: JIRA, Email, Slack, Microsoft Teams, Generic WebHook, Splunk and ServiceNow.
 
-When this integration is enabled, a ticket is opened, or an email/message is sent, with information about the vulnerabilities found in the image. 
+## Main Features
+Some features that Postee provides:
 
-Some features that are supported with this integration:
+1. Image rescans: When an image is rescanned, the integration will not send a message if the scan results are same as the previous scan results. If the scan results are different then a message with the diff between the results will be sent.
 
-1. Image rescans: When an image is rescanned, the integration will not open a ticket/send a message it the scan results are same as the previous scan results. If the scan results are different then a ticket/message with the diff between the results will be sent.
-
-2. Scan policy: You can create a policy that will create ticket / send message based on image scan criteria. The criteria can be based on the image name, registry name and scan results (e.g. only if there are high severity vulnerabilities).
+2. Scan policy: You can create a policy that sends a message based on image scan criteria. The criteria can be based on the image name, registry name and scan results (e.g. only if there are high severity vulnerabilities).
 For more information see "Policy-Min-Vulnerability", "Policy-Registry", "Policy-Image-Name", "Policy-Only-Fix-Available", "Policy-Non-Compliant" tokens in the cfg.yaml file.
 
 3. Ignore policy: You can create a policy that ignores specific registries/images.
@@ -32,26 +36,26 @@ For more information see "Ignore-Registry" and "Ignore-Image-Name" tokens in the
 4. Aggregation policy: You can aggregate multiple scan results in a single ticket/message. This is useful if you would like to get a digest on daily/weekly basis.
 For more information see "Aggregate-Issues-Number" and "Aggregate-Issues-Timeout" tokens in the cfg.yaml file.
 
-# Quick Start #
+## Quick Start 
 Follow these steps to set up JIRA integration:
 
 1. Clone this project: 
 ```bash
-git clone git@github.com:aquasecurity/alm-integration.git
+git clone git@github.com:aquasecurity/postee.git
 ```
 
-2. Build the alm-integration Docker image: 
+2. Build the postee Docker image: 
 ```bash
-docker build -t alm-integration:latest .
+docker build -t postee:latest .
 ```
 
 3. [Edit the configuration file (cfg.yaml)](#set-up-the-configuration-file) with the connection details of your JIRA, Slack, etc.
 
-4. Run the Aqua ALM Integration container with the configuration file: 
+4. Run the Aqua Postee container with the configuration file: 
 ```bash
 docker run -d --name=aqua-webhook -v /<path to configuration file>/cfg.yaml:/config/cfg.yaml \
     -e AQUAALERT_CFG=/config/cfg.yaml -e AQUAALERT_URL=0.0.0.0:8084 -e AQUAALERT_TLS=0.0.0.0:8444 \ 
-    -p 8444:8444 -p 8084:8084 alm-integration:latest
+    -p 8444:8444 -p 8084:8084 postee:latest
 ```
 
 5. Configure the Aqua Server to send a Webhook notification when a new vulnerability is found
@@ -117,21 +121,26 @@ See the [bottom of this page](#Integration-Settings) for other integration types
 ###### *To prevent providing clear text passwords in text file you can pass an environment variable, e.g. $MY_PASSWORD.
 You will need to make sure this environment variable value is passed to the container.
 
-## Run the Aqua ALM Integration Container
+## Run the Aqua Postee Container
 
 Build and run the Aqua Webhook Server container on the same host where the JIRA configuration file is located, as follows:
 
 ```bash
-docker build -t alm-integration-image:latest .
+docker build -t postee:latest .
 
 docker run -d --name=aqua-webhook -v /<path to configuration file>/cfg.yaml:/config/cfg.yaml \
     -e AQUAALERT_CFG=/config/cfg.yaml -e AQUAALERT_URL=0.0.0.0:8084 -e AQUAALERT_TLS=0.0.0.0:8444 \
-    -p 8444:8444 -p 8084:8084 alm-integration-image:latest
+    -p 8444:8444 -p 8084:8084 postee:latest
 
 ```
 
 ###### *There is a volume mount that mounts the configuration file from the host to the container. There is also an environment variable, AQUAALERT_CFG, that specifies the location of the JIRA configuration file inside the container.*
 
+## Configure the Splunk Integration
+You will need to craate an HTTP Event Collector in Splunk Enterprise or Splunk Cloud.
+This can usually be found in the Splunk console under "Settings -> Data Inputs -> HTTP Event Collector -> Add New".
+Once you create an HTTP Event Collector you will receive a token. You should provide this token, together with the Splunk HTTP Collector
+URL, as part of the cfg.yaml settings.
 
 ## Configure the Aqua Server with Webhook Integration
 
@@ -151,7 +160,7 @@ To validate that the integration is working, you can scan a new image for securi
 
 When vulnerabilities are found in an image, you will see that a JIRA ticket is created/ Email is recieved/ Slack message is posted to the channel.
 
-###### *To troubleshoot the integration, you can look at both the Aqua ALM Integration container logs and the Aqua Server logs. Use the "docker logs <container name>" command to view these logs.*
+###### *To troubleshoot the integration, you can look at both the Aqua Postee container logs and the Aqua Server logs. Use the "docker logs <container name>" command to view these logs.*
 
 # Integration Settings
 You can setup integrations through the cfg.yaml file. Note that one yaml file can contain multiple integrations (e.g. multiple email integrations, where each integration is handling different container image registry).
@@ -240,16 +249,22 @@ Key | Description | Possible Values
 --- | --- | ---
 url | MS Teams WebHook URL |
 
+## Splunk integration parameters
+Key | Description | Possible Values
+--- | --- | ---
+token | The Splunk HTTP event collector token | 
+url | URL to Splunk HTTP event collector (e.g. http://server:8088) |
+
 ## Generic Webhook integration parameters
 Key | Description | Possible Values
 --- | --- | ---
 url | Webhook URL |
 
 # Data Persistency #
-The ALM-Integration container uses BoltDB to store information about previously scanned images.
+The Postee container uses BoltDB to store information about previously scanned images.
 This is used to prevent resending messages that were already sent before.
 The size of the database can grow over time. Every image that is saved in the database uses 20K of storage.
 
-If you would like to persist the database file between restarts of the ALM-Integration container, then you should
+If you would like to persist the database file between restarts of the Postee container, then you should
 use a persistent storage option to mount the "/server/database" directory of the container.
 The "Kubernetes" directory in this project contains an example deployment that includes a basic Host Persistency.
