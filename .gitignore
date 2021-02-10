@@ -8,4 +8,4 @@ src/go.etcd.io/
 **/*.db
 coverage.txt
 dist/
-
+bin/

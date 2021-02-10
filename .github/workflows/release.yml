@@ -4,6 +4,8 @@ on:
     branches: [main]
     tags:
       - "*"
+  pull_request:
+    branches: [main]
 env:
   GO_VERSION: "1.15"
 jobs:
@@ -53,6 +55,7 @@ jobs:
         with:
           version: v0.155.0
           args: release --rm-dist
+          workdir: .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Log out from docker.io and ECR registries

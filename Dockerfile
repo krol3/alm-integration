@@ -3,6 +3,8 @@ RUN apk add --update make git
 ADD . /webhook/
 WORKDIR /webhook/
 ENV GOPATH=$GOPATH:/webhook
+RUN pwd
+RUN ls
 RUN make all
 
 

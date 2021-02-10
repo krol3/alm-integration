@@ -17,7 +17,7 @@ makedir :
 
 build :
 	@echo "building...."
-	$(GO_INSTALL)  $(EXENAME)
+	$(GO_BUILD) -o ./bin/postee $(EXENAME)
 	@echo "Done!"
 
 get :
