@@ -1,3 +1,4 @@
+project_name: postee
 release:
   draft: false
   prerelease: auto
